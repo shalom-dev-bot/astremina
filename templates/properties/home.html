@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "Home" %} - Astremina{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="relative h-screen flex items-center justify-center gradient-bg">
+    <div class="absolute inset-0 bg-black opacity-50"></div>
+    <div class="relative z-10 text-center max-w-4xl mx-auto px-4">
+        <h1 class="text-5xl md:text-7xl font-bold text-white mb-6">
+            {% trans "Find Your Dream" %}
+            <span class="text-netflix-red">{% trans "Property" %}</span>
+        </h1>
+        <p class="text-xl md:text-2xl text-netflix-light-gray mb-12">
+            {% trans "Discover the best real estate and hotels in Cameroon" %}
+        </p>
+        
+        <!-- Search Form -->
+        <div class="bg-netflix-dark-gray rounded-2xl p-8 shadow-2xl border border-netflix-gray max-w-4xl mx-auto">
+            <form method="get" action="{% url 'properties:list' %}" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="relative">
+                    <i class="fas fa-map-marker-alt absolute left-4 top-1/2 transform -translate-y-1/2 text-netflix-light-gray"></i>
+                    <input type="text" 
+                           name="city" 
+                           placeholder="{% trans 'City' %}"
+                           value="{{ request.GET.city }}"
+                           class="w-full pl-12 pr-4 py-4 bg-netflix-gray border border-netflix-light-gray rounded-lg text-white placeholder-netflix-light-gray focus:outline-none focus:ring-2 focus:ring-netflix-red focus:border-transparent">
+                </div>
+                
+                <div class="relative">
+                    <i class="fas fa-home absolute left-4 top-1/2 transform -translate-y-1/2 text-netflix-light-gray"></i>
+                    <select name="property_type" 
+                            class="w-full pl-12 pr-4 py-4 bg-netflix-gray border border-netflix-light-gray rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-netflix-red focus:border-transparent">
+                        <option value="">{% trans "All Types" %}</option>
+                        <option value="house">{% trans "House" %}</option>
+                        <option value="apartment">{% trans "Apartment" %}</option>
+                        <option value="land">{% trans "Land" %}</option>
+                        <option value="hotel">{% trans "Hotel" %}</option>
+                    </select>
+                </div>
+                
+                <div class="relative">
+                    <i class="fas fa-dollar-sign absolute left-4 top-1/2 transform -translate-y-1/2 text-netflix-light-gray"></i>
+                    <input type="number" 
+                           name="max_price" 
+                           placeholder="{% trans 'Max Price' %}"
+                           value="{{ request.GET.max_price }}"
+                           class="w-full pl-12 pr-4 py-4 bg-netflix-gray border border-netflix-light-gray rounded-lg text-white placeholder-netflix-light-gray focus:outline-none focus:ring-2 focus:ring-netflix-red focus:border-transparent">
+                </div>
+                
+                <button type="submit" 
+                        class="btn-primary py-4 px-8 rounded-lg text-white font-semibold flex items-center justify-center space-x-2">
+                    <i class="fas fa-search"></i>
+                    <span>{% trans "Search" %}</span>
+                </button>
+            </form>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Properties -->
+<section class="py-20 bg-netflix-black">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl font-bold text-white mb-4">
+                {% trans "Featured Properties" %}
+            </h2>
+            <p class="text-xl text-netflix-light-gray">
+                {% trans "Discover our handpicked selection of premium properties" %}
+            </p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for property in recent_properties %}
+                <div class="bg-netflix-dark-gray rounded-xl overflow-hidden shadow-lg card-hover border border-netflix-gray">
+                    <!-- Property Image -->
+                    <div class="relative h-64">
+                        {% if property.images.all %}
+                            <img src="{{ property.images.first.image.url }}" 
+                                 alt="{{ property.title }}"
+                                 class="w-full h-full object-cover">
+                        {% else %}
+                            <div class="w-full h-full bg-netflix-gray flex items-center justify-center">
+                                <i class="fas fa-home text-netflix-light-gray text-4xl"></i>
+                            </div>
+                        {% endif %}
+                        
+                        <!-- Property Type Badge -->
+                        <div class="absolute top-4 left-4">
+                            <span class="bg-netflix-red text-white px-3 py-1 rounded-full text-sm font-medium">
+                                {{ property.get_property_type_display }}
+                            </span>
+                        </div>
+                        
+                        <!-- Favorite Button -->
+                        {% if user.is_authenticated %}
+                            <button class="absolute top-4 right-4 w-10 h-10 bg-black bg-opacity-50 rounded-full flex items-center justify-center text-white hover:bg-netflix-red transition-colors">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Property Info -->
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold text-white mb-2">
+                            <a href="{% url 'properties:detail' property.slug %}" class="hover:text-netflix-red transition-colors">
+                                {{ property.title }}
+                            </a>
+                        </h3>
+                        
+                        <div class="flex items-center text-netflix-light-gray mb-3">
+                            <i class="fas fa-map-marker-alt mr-2"></i>
+                            <span>{{ property.city }}{% if property.neighborhood %}, {{ property.neighborhood }}{% endif %}</span>
+                        </div>
+                        
+                        <div class="flex items-center justify-between">
+                            <div class="text-2xl font-bold text-netflix-red">
+                                {{ property.price|floatformat:0 }} {{ property.currency }}
+                            </div>
+                            
+                            {% if property.bedrooms %}
+                                <div class="flex items-center text-netflix-light-gray">
+                                    <i class="fas fa-bed mr-1"></i>
+                                    <span>{{ property.bedrooms }}</span>
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <a href="{% url 'properties:detail' property.slug %}" 
+                           class="mt-4 block w-full text-center py-3 bg-netflix-gray hover:bg-netflix-red text-white rounded-lg transition-colors">
+                            {% trans "View Details" %}
+                        </a>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-span-full text-center py-12">
+                    <i class="fas fa-home text-netflix-light-gray text-6xl mb-4"></i>
+                    <p class="text-xl text-netflix-light-gray">
+                        {% trans "No properties available at the moment." %}
+                    </p>
+                </div>
+            {% endfor %}
+        </div>
+        
+        <div class="text-center mt-12">
+            <a href="{% url 'properties:list' %}" 
+               class="btn-primary px-8 py-4 rounded-lg text-white font-semibold inline-flex items-center space-x-2">
+                <span>{% trans "View All Properties" %}</span>
+                <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Section -->
+<section class="py-20 bg-netflix-dark-gray">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8 text-center">
+            <div class="p-6">
+                <div class="text-4xl font-bold text-netflix-red mb-2">1000+</div>
+                <div class="text-netflix-light-gray">{% trans "Properties Listed" %}</div>
+            </div>
+            <div class="p-6">
+                <div class="text-4xl font-bold text-netflix-red mb-2">500+</div>
+                <div class="text-netflix-light-gray">{% trans "Happy Clients" %}</div>
+            </div>
+            <div class="p-6">
+                <div class="text-4xl font-bold text-netflix-red mb-2">50+</div>
+                <div class="text-netflix-light-gray">{% trans "Partner Agents" %}</div>
+            </div>
+            <div class="p-6">
+                <div class="text-4xl font-bold text-netflix-red mb-2">10+</div>
+                <div class="text-netflix-light-gray">{% trans "Cities Covered" %}</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-20 bg-netflix-black">
+    <div class="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+        <h2 class="text-4xl font-bold text-white mb-6">
+            {% trans "Ready to Find Your Perfect Property?" %}
+        </h2>
+        <p class="text-xl text-netflix-light-gray mb-8">
+            {% trans "Join thousands of satisfied customers who found their dream homes through Astremina" %}
+        </p>
+        
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="{% url 'properties:list' %}" 
+               class="btn-primary px-8 py-4 rounded-lg text-white font-semibold">
+                {% trans "Browse Properties" %}
+            </a>
+            <a href="{% url 'properties:map' %}" 
+               class="px-8 py-4 border-2 border-netflix-red text-netflix-red hover:bg-netflix-red hover:text-white rounded-lg font-semibold transition-colors">
+                {% trans "Explore Map" %}
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}
