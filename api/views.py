@@ -7,15 +7,17 @@ from django.contrib.auth import get_user_model
 from django.db.models import Count, Q
 from django.utils import timezone
 from datetime import timedelta
+from django.utils.translation import gettext_lazy as _
 
-from properties.models import Property, Favorite, Alert
+from properties.models import Property, Favorite
+from alerts.models import PropertyAlert
 from partners.models import Partner, Contract
 from scraping.models import ScrapingSource
 from scraping.tasks import scrape_source
 
 from .serializers import (
     UserSerializer, PropertySerializer, PropertyListSerializer,
-    FavoriteSerializer, AlertSerializer, PartnerSerializer, ContractSerializer
+    FavoriteSerializer, PropertyAlertSerializer, PartnerSerializer, ContractSerializer
 )
 from .filters import PropertyFilter
 from .permissions import IsOwnerOrReadOnly, IsPartnerOrAdmin
@@ -93,13 +95,25 @@ class FavoriteViewSet(viewsets.ModelViewSet):
     
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+    
+    @action(detail=True, methods=['delete'])
+    def remove(self, request, pk=None):
+        """Supprime un favori spécifique."""
+        favorite = self.get_object()
+        property_title = favorite.property.title
+        favorite.delete()
+        return Response({
+            'message': _('Favorite removed: {}').format(property_title),
+            'property_id': str(favorite.property.id)
+        }, status=status.HTTP_200_OK)
 
 class AlertViewSet(viewsets.ModelViewSet):
-    serializer_class = AlertSerializer
+    """API pour gérer les alertes"""
+    serializer_class = PropertyAlertSerializer
     permission_classes = [permissions.IsAuthenticated]
     
     def get_queryset(self):
-        return Alert.objects.filter(user=self.request.user)
+        return PropertyAlert.objects.filter(user=self.request.user).order_by('-created_at')
     
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)

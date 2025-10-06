@@ -11,12 +11,12 @@ from .views import (
 )
 
 router = DefaultRouter()
-router.register(r'users', UserViewSet)
-router.register(r'properties', PropertyViewSet)
-router.register(r'favorites', FavoriteViewSet)
-router.register(r'alerts', AlertViewSet)
-router.register(r'partners', PartnerViewSet)
-router.register(r'contracts', ContractViewSet)
+router.register(r'users', UserViewSet, basename='user')
+router.register(r'properties', PropertyViewSet, basename='property')
+router.register(r'favorites', FavoriteViewSet, basename='favorite')
+router.register(r'alerts', AlertViewSet, basename='alert')
+router.register(r'partners', PartnerViewSet, basename='partner')
+router.register(r'contracts', ContractViewSet, basename='contract')
 
 urlpatterns = [
     # Authentication
