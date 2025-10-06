@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load tailwind_filters %}
+
+{% block title %}{% trans "Properties" %} - Astremina{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-netflix-black text-white">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Search Filters -->
+        <div class="bg-netflix-dark-gray rounded-2xl p-8 mb-8 shadow-lg border border-netflix-gray">
+            <h2 class="text-2xl font-bold text-netflix-red mb-6">{% trans "Search Properties" %}</h2>
+            <form method="get" action="{% url 'properties:list' %}" class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                <div class="relative">
+                    <i class="fas fa-map-marker-alt absolute left-4 top-1/2 transform -translate-y-1/2 text-netflix-light-gray"></i>
+                    <input type="text" 
+                           name="city" 
+                           placeholder="{% trans 'City' %}"
+                           value="{{ search_form.city.value|default_if_none:'' }}"
+                           class="w-full pl-12 pr-4 py-4 bg-netflix-gray border border-netflix-light-gray rounded-lg text-white placeholder-netflix-light-gray focus:outline-none focus:ring-2 focus:ring-netflix-red">
+                </div>
+                <div class="relative">
+                    <i class="fas fa-home absolute left-4 top-1/2 transform -translate-y-1/2 text-netflix-light-gray"></i>
+                    <select name="property_type" 
+                            class="w-full pl-12 pr-4 py-4 bg-netflix-gray border border-netflix-light-gray rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-netflix-red">
+                        <option value="">{% trans "All Types" %}</option>
+                        <option value="house" {% if search_form.property_type.value == 'house' %}selected{% endif %}>{% trans "House" %}</option>
+                        <option value="apartment" {% if search_form.property_type.value == 'apartment' %}selected{% endif %}>{% trans "Apartment" %}</option>
+                        <option value="land" {% if search_form.property_type.value == 'land' %}selected{% endif %}>{% trans "Land" %}</option>
+                        <option value="hotel" {% if search_form.property_type.value == 'hotel' %}selected{% endif %}>{% trans "Hotel" %}</option>
+                    </select>
+                </div>
+                <div class="relative">
+                    <i class="fas fa-dollar-sign absolute left-4 top-1/2 transform -translate-y-1/2 text-netflix-light-gray"></i>
+                    <input type="number" 
+                           name="min_price" 
+                           placeholder="{% trans 'Min Price' %}"
+                           value="{{ search_form.min_price.value|default_if_none:'' }}"
+                           class="w-full pl-12 pr-4 py-4 bg-netflix-gray border border-netflix-light-gray rounded-lg text-white placeholder-netflix-light-gray focus:outline-none focus:ring-2 focus:ring-netflix-red">
+                </div>
+                <div class="relative">
+                    <i class="fas fa-dollar-sign absolute left-4 top-1/2 transform -translate-y-1/2 text-netflix-light-gray"></i>
+                    <input type="number" 
+                           name="max_price" 
+                           placeholder="{% trans 'Max Price' %}"
+                           value="{{ search_form.max_price.value|default_if_none:'' }}"
+                           class="w-full pl-12 pr-4 py-4 bg-netflix-gray border border-netflix-light-gray rounded-lg text-white placeholder-netflix-light-gray focus:outline-none focus:ring-2 focus:ring-netflix-red">
+                </div>
+                <button type="submit" 
+                        class="btn-primary py-4 px-8 rounded-lg text-white font-semibold flex items-center justify-center space-x-2">
+                    <i class="fas fa-search"></i>
+                    <span>{% trans "Search" %}</span>
+                </button>
+            </form>
+        </div>
+
+        <!-- Property List -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for property in page_obj %}
+                <div class="bg-netflix-dark-gray rounded-xl overflow-hidden shadow-lg card-hover border border-netflix-gray">
+                    <div class="relative h-64">
+                        {% if property.images.all %}
+                            <img src="{{ property.images.first.image.url }}" 
+                                 alt="{{ property.title }}"
+                                 class="w-full h-full object-cover">
+                        {% else %}
+                            <div class="w-full h-full bg-netflix-gray flex items-center justify-center">
+                                <i class="fas fa-home text-netflix-light-gray text-4xl"></i>
+                            </div>
+                        {% endif %}
+                        <div class="absolute top-4 left-4">
+                            <span class="bg-netflix-red text-white px-3 py-1 rounded-full text-sm font-medium">
+                                {{ property.get_property_type_display }}
+                            </span>
+                        </div>
+                        {% if user.is_authenticated %}
+                            <form action="{% url 'api:favorite-create' %}" method="post" class="absolute top-4 right-4">
+                                {% csrf_token %}
+                                <input type="hidden" name="property_id" value="{{ property.id }}">
+                                <button type="submit" class="w-10 h-10 bg-black bg-opacity-50 rounded-full flex items-center justify-center text-white hover:bg-netflix-red transition-colors">
+                                    <i class="fas fa-heart"></i>
+                                </button>
+                            </form>
+                        {% endif %}
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold text-white mb-2">
+                            <a href="{% url 'properties:detail' property.slug %}" class="hover:text-netflix-red transition-colors">
+                                {{ property.title }}
+                            </a>
+                        </h3>
+                        <div class="flex items-center text-netflix-light-gray mb-3">
+                            <i class="fas fa-map-marker-alt mr-2"></i>
+                            <span>{{ property.city }}{% if property.neighborhood %}, {{ property.neighborhood }}{% endif %}</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="text-2xl font-bold text-netflix-red">
+                                {{ property.price|floatformat:0 }} {{ property.currency }}
+                            </div>
+                            {% if property.bedrooms %}
+                                <div class="flex items-center text-netflix-light-gray">
+                                    <i class="fas fa-bed mr-1"></i>
+                                    <span>{{ property.bedrooms }}</span>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-span-full text-center py-12">
+                    <i class="fas fa-home text-netflix-light-gray text-6xl mb-4"></i>
+                    <p class="text-xl text-netflix-light-gray">{% trans "No properties found." %}</p>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+            <div class="mt-8 flex justify-center">
+                <nav class="inline-flex rounded-lg shadow-lg">
+                    {% if page_obj.has_previous %}
+                        <a href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" 
+                           class="px-4 py-2 bg-netflix-gray text-white rounded-l-lg hover:bg-netflix-red transition-colors">
+                            {% trans "Previous" %}
+                        </a>
+                    {% endif %}
+                    {% for num in page_obj.paginator.page_range %}
+                        <a href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" 
+                           class="px-4 py-2 {% if page_obj.number == num %}bg-netflix-red{% else %}bg-netflix-gray{% endif %} text-white hover:bg-netflix-red transition-colors">
+                            {{ num }}
+                        </a>
+                    {% endfor %}
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" 
+                           class="px-4 py-2 bg-netflix-gray text-white rounded-r-lg hover:bg-netflix-red transition-colors">
+                            {% trans "Next" %}
+                        </a>
+                    {% endif %}
+                </nav>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

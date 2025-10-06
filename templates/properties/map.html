@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load tailwind_filters %}
+
+{% block title %}{% trans "Property Map" %} - Astremina{% endblock %}
+
+{% block extra_css %}
+<style>
+    #map { height: 600px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-netflix-black text-white">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold text-netflix-red mb-6">{% trans "Explore Properties on Map" %}</h1>
+        <div id="map" class="rounded-lg border border-netflix-gray"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Initialiser la carte
+    const map = L.map('map').setView([4.0511, 9.7679], 7); // Centre sur le Cameroun
+
+    // Ajouter la couche de tuiles OpenStreetMap
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    // Charger les propriétés via l'API
+    fetch('/api/properties/search_by_bbox/?min_lat=-90&min_lng=-180&max_lat=90&max_lng=180')
+        .then(response => response.json())
+        .then(data => {
+            data.forEach(property => {
+                if (property.latitude && property.longitude) {
+                    const marker = L.marker([property.latitude, property.longitude]).addTo(map);
+                    marker.bindPopup(`
+                        <div class="p-2">
+                            <h3 class="font-bold text-netflix-red">${property.title}</h3>
+                            <p>${property.city} • ${property.price} ${property.currency}</p>
+                            <a href="/properties/${property.slug}/" class="text-netflix-red hover:underline">{% trans "View Details" %}</a>
+                        </div>
+                    `);
+                }
+            });
+        });
+</script>
+{% endblock %}

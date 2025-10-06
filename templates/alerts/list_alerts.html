@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load tailwind_filters %}
+
+{% block title %}{% trans "My Property Alerts" %}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-netflix-black text-white">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold text-netflix-red mb-6">{% trans "My Property Alerts" %}</h1>
+
+        {% if alerts %}
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% for alert in alerts %}
+                    <div class="bg-netflix-gray rounded-lg p-6 shadow-lg border border-netflix-light-gray">
+                        <h2 class="text-xl font-semibold mb-2">{{ alert.name }}</h2>
+                        <p class="text-netflix-light-gray">
+                            {% trans "City" %}: {{ alert.city|default:_("Any") }}<br>
+                            {% trans "Property Type" %}: {{ alert.get_property_type_display|default:_("Any") }}<br>
+                            {% trans "Price Range" %}: {{ alert.min_price|default:0 }} - {{ alert.max_price|default:_("No limit") }} XAF<br>
+                            {% trans "Min Bedrooms" %}: {{ alert.min_bedrooms|default:0 }}<br>
+                            {% trans "Status" %}: {% if alert.is_active %}{% trans "Active" %}{% else %}{% trans "Inactive" %}{% endif %}
+                        </p>
+                        <div class="mt-4 flex space-x-4">
+                            <a href="{% url 'alerts:edit_alert' alert.id %}" class="bg-netflix-red text-white px-4 py-2 rounded hover:bg-red-700 transition">
+                                {% trans "Edit" %}
+                            </a>
+                            <form action="{% url 'alerts:delete_alert' alert.id %}" method="post" class="inline">
+                                {% csrf_token %}
+                                <button type="submit" class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 transition">
+                                    {% trans "Delete" %}
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-netflix-light-gray">{% trans "You have no alerts yet." %}</p>
+            <a href="{% url 'alerts:create_alert' %}" class="bg-netflix-red text-white px-6 py-3 rounded hover:bg-red-700 transition mt-4 inline-block">
+                {% trans "Create New Alert" %}
+            </a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

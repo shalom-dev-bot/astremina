@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load tailwind_filters %}
+
+{% block title %}{% trans "Delete Alert" %} - Astremina{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-netflix-black text-white">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold text-netflix-red mb-6">{% trans "Delete Property Alert" %}</h1>
+        <div class="bg-netflix-dark-gray rounded-lg p-8 shadow-lg border border-netflix-gray max-w-2xl mx-auto">
+            <p class="text-netflix-light-gray mb-6">
+                {% trans "Are you sure you want to delete the alert" %} "<strong>{{ alert.name }}</strong>"?
+            </p>
+            <form method="post" class="flex space-x-4">
+                {% csrf_token %}
+                <button type="submit" class="btn-primary px-6 py-3 rounded-lg text-white font-semibold">
+                    {% trans "Confirm Delete" %}
+                </button>
+                <a href="{% url 'alerts:list' %}" class="px-6 py-3 bg-netflix-gray text-white rounded-lg hover:bg-netflix-light-gray transition-colors">
+                    {% trans "Cancel" %}
+                </a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

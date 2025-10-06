@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load tailwind_filters %}
+
+{% block title %}{% trans "Edit Property" %} - Astremina{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-netflix-black text-white">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold text-netflix-red mb-6">{% trans "Edit Property" %}</h1>
+        <div class="bg-netflix-dark-gray rounded-lg p-8 shadow-lg border border-netflix-gray max-w-2xl mx-auto">
+            <form method="post" enctype="multipart/form-data" class="space-y-6">
+                {% csrf_token %}
+                <div class="relative">
+                    <label for="{{ form.title.id_for_label }}" class="block text-netflix-light-gray mb-2">
+                        {% trans "Title" %}
+                    </label>
+                    {{ form.title|add_class:"w-full px-4 py-3 bg-netflix-gray border border-netflix-light-gray rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-netflix-red" }}
+                    {% if form.title.errors %}
+                        <p class="text-red-400 text-sm mt-1">{{ form.title.errors }}</p>
+                    {% endif %}
+                </div>
+                <div class="relative">
+                    <label for="{{ form.description.id_for_label }}" class="block text-netflix-light-gray mb-2">
+                        {% trans "Description" %}
+                    </label>
+                    {{ form.description|add_class:"w-full px-4 py-3 bg-netflix-gray border border-netflix-light-gray rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-netflix-red" }}
+                    {% if form.description.errors %}
+                        <p class="text-red-400 text-sm mt-1">{{ form.description.errors }}</p>
+                    {% endif %}
+                </div>
+                <div class="relative">
+                    <label for="{{ form.property_type.id_for_label }}" class="block text-netflix-light-gray mb-2">
+                        {% trans "Property Type" %}
+                    </label>
+                    {{ form.property_type|add_class:"w-full px-4 py-3 bg-netflix-gray border border-netflix-light-gray rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-netflix-red" }}
+                    {% if form.property_type.errors %}
+                        <p class="text-red-400 text-sm mt-1">{{ form.property_type.errors }}</p>
+                    {% endif %}
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="relative">
+                        <label for="{{ form.price.id_for_label }}" class="block text-netflix-light-gray mb-2">
+                            {% trans "Price" %}
+                        </label>
+                        {{ form.price|add_class:"w-full px-4 py-3 bg-netflix-gray border border-netflix-light-gray rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-netflix-red" }}
+                        {% if form.price.errors %}
+                            <p class="text-red-400 text-sm mt-1">{{ form.price.errors }}</p>
+                        {% endif %}
+                    </div>
+                    <div class="relative">
+                        <label for="{{ form.currency.id_for_label }}" class="block text-netflix-light-gray mb-2">
+                            {% trans "Currency" %}
+                        </label>
+                        {{ form.currency|add_class:"w-full px-4 py-3 bg-netflix-gray border border-netflix-light-gray rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-netflix-red" }}
+                        {% if form.currency.errors %}
+                            <p class="text-red-400 text-sm mt-1">{{ form.currency.errors }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="relative">
+                    <label for="{{ form.city.id_for_label }}" class="block text-netflix-light-gray mb-2">
+                        {% trans "City" %}
+                    </label>
+                    {{ form.city|add_class:"w-full px-4 py-3 bg-netflix-gray border border-netflix-light-gray rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-netflix-red" }}
+                    {% if form.city.errors %}
+                        <p class="text-red-400 text-sm mt-1">{{ form.city.errors }}</p>
+                    {% endif %}
+                </div>
+                <div class="relative">
+                    <label for="{{ form.neighborhood.id_for_label }}" class="block text-netflix-light-gray mb-2">
+                        {% trans "Neighborhood" %}
+                    </label>
+                    {{ form.neighborhood|add_class:"w-full px-4 py-3 bg-netflix-gray border border-netflix-light-gray rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-netflix-red" }}
+                    {% if form.neighborhood.errors %}
+                        <p class="text-red-400 text-sm mt-1">{{ form.neighborhood.errors }}</p>
+                    {% endif %}
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="relative">
+                        <label for="{{ form.bedrooms.id_for_label }}" class="block text-netflix-light-gray mb-2">
+                            {% trans "Bedrooms" %}
+                        </label>
+                        {{ form.bedrooms|add_class:"w-full px-4 py-3 bg-netflix-gray border border-netflix-light-gray rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-netflix-red" }}
+                        {% if form.bedrooms.errors %}
+                            <p class="text-red-400 text-sm mt-1">{{ form.bedrooms.errors }}</p>
+                        {% endif %}
+                    </div>
+                    <div class="relative">
+                        <label for="{{ form.bathrooms.id_for_label }}" class="block text-netflix-light-gray mb-2">
+                            {% trans "Bathrooms" %}
+                        </label>
+                        {{ form.bathrooms|add_class:"w-full px-4 py-3 bg-netflix-gray border border-netflix-light-gray rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-netflix-red" }}
+                        {% if form.bathrooms.errors %}
+                            <p class="text-red-400 text-sm mt-1">{{ form.bathrooms.errors }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="relative">
+                    <label for="{{ form.surface_area.id_for_label }}" class="block text-netflix-light-gray mb-2">
+                        {% trans "Surface Area (m²)" %}
+                    </label>
+                    {{ form.surface_area|add_class:"w-full px-4 py-3 bg-netflix-gray border border-netflix-light-gray rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-netflix-red" }}
+                    {% if form.surface_area.errors %}
+                        <p class="text-red-400 text-sm mt-1">{{ form.surface_area.errors }}</p>
+                    {% endif %}
+                </div>
+                <div class="relative">
+                    <label for="{{ form.images.id_for_label }}" class="block text-netflix-light-gray mb-2">
+                        {% trans "Images" %}
+                    </label>
+                    {{ form.images|add_class:"w-full px-4 py-3 bg-netflix-gray border border-netflix-light-gray rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-netflix-red" }}
+                    {% if form.images.errors %}
+                        <p class="text-red-400 text-sm mt-1">{{ form.images.errors }}</p>
+                    {% endif %}
+                </div>
+                <button type="submit" 
+                        class="btn-primary w-full py-3 rounded-lg text-white font-semibold flex items-center justify-center space-x-2">
+                    <i class="fas fa-save"></i>
+                    <span>{% trans "Update Property" %}</span>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

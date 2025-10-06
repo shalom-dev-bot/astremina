@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load tailwind_filters %}
+
+{% block title %}{% trans "Partner Dashboard" %} - Astremina{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-netflix-black text-white">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold text-netflix-red mb-6">{% trans "Partner Dashboard" %}</h1>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- My Properties -->
+            <div class="bg-netflix-dark-gray rounded-lg p-6 shadow-lg border border-netflix-gray">
+                <h2 class="text-2xl font-semibold text-white mb-4">{% trans "My Properties" %}</h2>
+                {% if properties %}
+                    <div class="space-y-4">
+                        {% for property in properties %}
+                            <div class="bg-netflix-gray rounded-lg p-4 flex items-center justify-between">
+                                <div>
+                                    <h3 class="text-lg font-semibold">
+                                        <a href="{% url 'properties:detail' property.slug %}" class="hover:text-netflix-red transition-colors">
+                                            {{ property.title }}
+                                        </a>
+                                    </h3>
+                                    <p class="text-netflix-light-gray">
+                                        {{ property.city }} • {{ property.price|floatformat:0 }} {{ property.currency }}
+                                    </p>
+                                </div>
+                                <div class="flex space-x-2">
+                                    <a href="{% url 'properties:edit' property.slug %}" class="text-netflix-red hover:text-red-400">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{% url 'properties:delete' property.slug %}" class="text-netflix-red hover:text-red-400">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <a href="{% url 'properties:create' %}" class="btn-primary px-6 py-3 rounded-lg mt-6 inline-block">
+                        {% trans "Add New Property" %}
+                    </a>
+                {% else %}
+                    <p class="text-netflix-light-gray">{% trans "No properties listed yet." %}</p>
+                    <a href="{% url 'properties:create' %}" class="btn-primary px-6 py-3 rounded-lg mt-4 inline-block">
+                        {% trans "Add New Property" %}
+                    </a>
+                {% endif %}
+            </div>
+            <!-- My Contracts -->
+            <div class="bg-netflix-dark-gray rounded-lg p-6 shadow-lg border border-netflix-gray">
+                <h2 class="text-2xl font-semibold text-white mb-4">{% trans "My Contracts" %}</h2>
+                {% if contracts %}
+                    <div class="space-y-4">
+                        {% for contract in contracts %}
+                            <div class="bg-netflix-gray rounded-lg p-4">
+                                <h3 class="text-lg font-semibold">{{ contract.title }}</h3>
+                                <p class="text-netflix-light-gray">
+                                    {% trans "Status" %}: {{ contract.get_status_display }}<br>
+                                    {% trans "Start Date" %}: {{ contract.start_date|date:"Y-m-d" }}<br>
+                                    {% trans "End Date" %}: {{ contract.end_date|date:"Y-m-d" }}
+                                </p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-netflix-light-gray">{% trans "No active contracts." %}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

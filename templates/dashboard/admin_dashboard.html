@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load tailwind_filters %}
+
+{% block title %}{% trans "Admin Dashboard" %} - Astremina{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-netflix-black text-white">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold text-netflix-red mb-6">{% trans "Admin Dashboard" %}</h1>
+        
+        <!-- Statistiques -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            <!-- Statistiques Utilisateurs -->
+            <div class="bg-netflix-dark-gray rounded-lg p-6 shadow-lg border border-netflix-gray">
+                <h2 class="text-2xl font-semibold text-white mb-4">{% trans "User Statistics" %}</h2>
+                <div class="space-y-2 text-netflix-light-gray">
+                    <p>{% trans "Total Users" %}: <span class="text-netflix-red">{{ total_users }}</span></p>
+                    <p>{% trans "Active Users (30d)" %}: <span class="text-netflix-red">{{ active_users_30d }}</span></p>
+                    <p>{% trans "New Users (30d)" %}: <span class="text-netflix-red">{{ new_users_30d }}</span></p>
+                </div>
+            </div>
+            <!-- Statistiques Propriétés -->
+            <div class="bg-netflix-dark-gray rounded-lg p-6 shadow-lg border border-netflix-gray">
+                <h2 class="text-2xl font-semibold text-white mb-4">{% trans "Property Statistics" %}</h2>
+                <div class="space-y-2 text-netflix-light-gray">
+                    <p>{% trans "Total Properties" %}: <span class="text-netflix-red">{{ total_properties }}</span></p>
+                    <p>{% trans "Published Properties" %}: <span class="text-netflix-red">{{ published_properties }}</span></p>
+                    <p>{% trans "Average Price" %}: <span class="text-netflix-red">{{ avg_property_price }} XAF</span></p>
+                </div>
+            </div>
+            <!-- Statistiques Partenaires -->
+            <div class="bg-netflix-dark-gray rounded-lg p-6 shadow-lg border border-netflix-gray">
+                <h2 class="text-2xl font-semibold text-white mb-4">{% trans "Partner Statistics" %}</h2>
+                <div class="space-y-2 text-netflix-light-gray">
+                    <p>{% trans "Total Partners" %}: <span class="text-netflix-red">{{ total_partners }}</span></p>
+                    <p>{% trans "Active Contracts" %}: <span class="text-netflix-red">{{ active_contracts }}</span></p>
+                    <p>{% trans "Expired Contracts" %}: <span class="text-netflix-red">{{ expired_contracts }}</span></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dernières Stats Agrégées -->
+        {% if latest_stats %}
+        <div class="bg-netflix-dark-gray rounded-lg p-6 shadow-lg border border-netflix-gray mb-8">
+            <h2 class="text-2xl font-semibold text-white mb-4">{% trans "Latest Aggregated Stats" %}</h2>
+            <div class="text-netflix-light-gray">
+                <p>{% trans "Date" %}: <span class="text-netflix-red">{{ latest_stats.date|date:"Y-m-d" }}</span></p>
+                <p>{% trans "Total Views" %}: <span class="text-netflix-red">{{ latest_stats.total_views }}</span></p>
+                <p>{% trans "Unique Visitors" %}: <span class="text-netflix-red">{{ latest_stats.unique_visitors }}</span></p>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Propriétés par Ville -->
+        <div class="bg-netflix-dark-gray rounded-lg p-6 shadow-lg border border-netflix-gray mb-8">
+            <h2 class="text-2xl font-semibold text-white mb-4">{% trans "Properties by City (Top 10)" %}</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {% for city in properties_by_city %}
+                <div class="bg-netflix-gray rounded-lg p-4">
+                    <p class="text-netflix-light-gray">
+                        {{ city.city|default:_("Unknown") }}: 
+                        <span class="text-netflix-red">{{ city.count }} {% trans "properties" %}</span>
+                    </p>
+                </div>
+                {% empty %}
+                <p class="text-netflix-light-gray">{% trans "No properties found." %}</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Propriétés Récentes -->
+        <div class="bg-netflix-dark-gray rounded-lg p-6 shadow-lg border border-netflix-gray mb-8">
+            <h2 class="text-2xl font-semibold text-white mb-4">{% trans "Recent Properties" %}</h2>
+            {% if property_page_obj %}
+            <div class="space-y-4">
+                {% for property in property_page_obj %}
+                <div class="bg-netflix-gray rounded-lg p-4 flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-semibold">
+                            <a href="{% url 'properties:detail' property.slug %}" class="hover:text-netflix-red transition-colors">
+                                {{ property.title }}
+                            </a>
+                        </h3>
+                        <p class="text-netflix-light-gray">
+                            {{ property.city }} • {{ property.price|floatformat:0 }} {{ property.currency }} • 
+                            {% trans "Created" %}: {{ property.created_at|date:"Y-m-d" }}
+                        </p>
+                    </div>
+                    <div class="flex space-x-2">
+                        <a href="{% url 'properties:edit' property.slug %}" class="text-netflix-red hover:text-red-400">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <a href="{% url 'properties:delete' property.slug %}" class="text-netflix-red hover:text-red-400">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <!-- Pagination Propriétés -->
+            <div class="mt-4 flex justify-center">
+                <nav class="inline-flex space-x-2">
+                    {% if property_page_obj.has_previous %}
+                    <a href="?property_page={{ property_page_obj.previous_page_number }}" class="px-4 py-2 bg-netflix-gray text-white rounded-lg hover:bg-netflix-red transition-colors">
+                        {% trans "Previous" %}
+                    </a>
+                    {% endif %}
+                    <span class="px-4 py-2 text-netflix-light-gray">
+                        {% trans "Page" %} {{ property_page_obj.number }} {% trans "of" %} {{ property_page_obj.paginator.num_pages }}
+                    </span>
+                    {% if property_page_obj.has_next %}
+                    <a href="?property_page={{ property_page_obj.next_page_number }}" class="px-4 py-2 bg-netflix-gray text-white rounded-lg hover:bg-netflix-red transition-colors">
+                        {% trans "Next" %}
+                    </a>
+                    {% endif %}
+                </nav>
+            </div>
+            {% else %}
+            <p class="text-netflix-light-gray">{% trans "No recent properties." %}</p>
+            {% endif %}
+        </div>
+
+        <!-- Logs de Scraping -->
+        <div class="bg-netflix-dark-gray rounded-lg p-6 shadow-lg border border-netflix-gray">
+            <h2 class="text-2xl font-semibold text-white mb-4">{% trans "Recent Scraping Logs" %}</h2>
+            {% if scrape_page_obj %}
+            <div class="space-y-4">
+                {% for log in scrape_page_obj %}
+                <div class="bg-netflix-gray rounded-lg p-4">
+                    <p class="text-netflix-light-gray">
+                        {% trans "Source" %}: <span class="text-netflix-red">{{ log.source.name }}</span><br>
+                        {% trans "Started" %}: {{ log.started_at|date:"Y-m-d H:i" }}<br>
+                        {% trans "Status" %}: {{ log.status }}<br>
+                        {% trans "Items Scraped" %}: {{ log.items_scraped }}
+                    </p>
+                </div>
+                {% endfor %}
+            </div>
+            <!-- Pagination Logs -->
+            <div class="mt-4 flex justify-center">
+                <nav class="inline-flex space-x-2">
+                    {% if scrape_page_obj.has_previous %}
+                    <a href="?scrape_page={{ scrape_page_obj.previous_page_number }}" class="px-4 py-2 bg-netflix-gray text-white rounded-lg hover:bg-netflix-red transition-colors">
+                        {% trans "Previous" %}
+                    </a>
+                    {% endif %}
+                    <span class="px-4 py-2 text-netflix-light-gray">
+                        {% trans "Page" %} {{ scrape_page_obj.number }} {% trans "of" %} {{ scrape_page_obj.paginator.num_pages }}
+                    </span>
+                    {% if scrape_page_obj.has_next %}
+                    <a href="?scrape_page={{ scrape_page_obj.next_page_number }}" class="px-4 py-2 bg-netflix-gray text-white rounded-lg hover:bg-netflix-red transition-colors">
+                        {% trans "Next" %}
+                    </a>
+                    {% endif %}
+                </nav>
+            </div>
+            {% else %}
+            <p class="text-netflix-light-gray">{% trans "No recent scraping logs." %}</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

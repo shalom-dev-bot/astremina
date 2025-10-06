@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load tailwind_filters %}
+
+{% block title %}{{ property.title }}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-netflix-black text-white">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Property Details -->
+        <div class="bg-netflix-gray rounded-lg p-6 shadow-lg border border-netflix-light-gray">
+            <h1 class="text-3xl font-bold text-netflix-red mb-4">{{ property.title }}</h1>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Images -->
+                <div>
+                    {% if property.images.all %}
+                        <div class="relative">
+                            <img src="{{ property.images.first.image.url }}" alt="{{ property.title }}" class="w-full h-96 object-cover rounded-lg">
+                        </div>
+                        <div class="flex space-x-2 mt-4">
+                            {% for image in property.images.all %}
+                                <img src="{{ image.image.url }}" alt="{{ property.title }}" class="w-24 h-24 object-cover rounded-lg">
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-netflix-light-gray">{% trans "No images available" %}</p>
+                    {% endif %}
+                </div>
+                <!-- Details -->
+                <div>
+                    <p class="text-netflix-light-gray mb-2">
+                        {% trans "Price" %}: {{ property.price }} {{ property.currency }}<br>
+                        {% trans "City" %}: {{ property.city }}<br>
+                        {% trans "Neighborhood" %}: {{ property.neighborhood|default:_("N/A") }}<br>
+                        {% trans "Property Type" %}: {{ property.get_property_type_display }}<br>
+                        {% trans "Bedrooms" %}: {{ property.bedrooms|default:0 }}<br>
+                        {% trans "Bathrooms" %}: {{ property.bathrooms|default:0 }}<br>
+                        {% trans "Surface Area" %}: {{ property.surface_area|default:_("N/A") }} m²<br>
+                        {% trans "Owner" %}: {{ property.owner.get_full_name|default:property.owner.email }}
+                    </p>
+                    <p class="mt-4">{{ property.description }}</p>
+                    {% if user.is_authenticated %}
+                        <form action="{% url 'api:favorite-create' %}" method="post" class="mt-4">
+                            {% csrf_token %}
+                            <input type="hidden" name="property_id" value="{{ property.id }}">
+                            <button type="submit" class="bg-netflix-red text-white px-4 py-2 rounded hover:bg-red-700 transition">
+                                {% if is_favorite %}
+                                    {% trans "Remove from Favorites" %}
+                                {% else %}
+                                    {% trans "Add to Favorites" %}
+                                {% endif %}
+                            </button>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Similar Properties -->
+        {% if similar_properties %}
+            <h2 class="text-2xl font-bold text-netflix-red mt-8 mb-4">{% trans "Similar Properties" %}</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% for similar in similar_properties %}
+                    <div class="bg-netflix-gray rounded-lg p-4 shadow-lg border border-netflix-light-gray">
+                        <a href="{% url 'properties:detail' similar.slug %}">
+                            {% if similar.images.first %}
+                                <img src="{{ similar.images.first.image.url }}" alt="{{ similar.title }}" class="w-full h-48 object-cover rounded-lg mb-2">
+                            {% endif %}
+                            <h3 class="text-lg font-semibold">{{ similar.title }}</h3>
+                            <p class="text-netflix-light-gray">
+                                {{ similar.city }} • {{ similar.price }} {{ similar.currency }}
+                            </p>
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
