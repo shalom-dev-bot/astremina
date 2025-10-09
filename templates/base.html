@@ -5,6 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="{% static 'images/favicon.ico' %}">
     <title>{% block title %}Astremina - {% trans "Real Estate & Hotels in Cameroon" %}{% endblock %}</title>
     
     <!-- Tailwind CSS -->
@@ -275,7 +276,7 @@
         function changeLanguage(lang) {
             const form = document.createElement('form');
             form.method = 'POST';
-            form.action = '{% url "set_language" %}';
+            form.action = '/i18n/set-language/';
             
             const csrfToken = document.createElement('input');
             csrfToken.type = 'hidden';
