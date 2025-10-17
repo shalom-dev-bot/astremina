@@ -5,14 +5,14 @@ from django.conf.urls.static import static
 from django.conf.urls.i18n import i18n_patterns
 
 urlpatterns = [
+    path('i18n/', include('django.conf.urls.i18n')),
     path('admin/', admin.site.urls),
     path('api/', include('api.urls')),
     path('accounts/', include('allauth.urls')),
     path('scraping/', include('scraping.urls')),
-    path('alerts/', include('alerts.urls')),  # Ajout pour le module alerts
+    path('alerts/', include('alerts.urls')),
 ]
 
-# Internationalized URLs
 urlpatterns += i18n_patterns(
     path('', include('properties.urls')),
     path('dashboard/', include('dashboard.urls')),

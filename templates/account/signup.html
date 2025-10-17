@@ -120,21 +120,10 @@
                 <div class="flex-1 border-t border-netflix-gray"></div>
             </div>
             
-            <!-- Social Login Buttons -->
-            <div class="flex justify-center space-x-4">
-                <!-- Facebook -->
-                <a href="#" class="w-14 h-14 bg-netflix-gray hover:bg-blue-600 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-110">
-                    <i class="fab fa-facebook-f text-white text-xl"></i>
-                </a>
-                
-                <!-- Google -->
-                <a href="{% url 'socialaccount_login' 'google' %}" class="w-14 h-14 bg-netflix-gray hover:bg-red-600 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-110">
+            <!-- Social Login Button (Google only) -->
+            <div class="flex justify-center">
+                <a href="{% url 'social:begin' 'google-oauth2' %}" class="w-14 h-14 bg-netflix-gray hover:bg-red-600 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-110">
                     <i class="fab fa-google text-white text-xl"></i>
-                </a>
-                
-                <!-- Custom Icon -->
-                <a href="#" class="w-14 h-14 bg-netflix-gray hover:bg-orange-600 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-110">
-                    <i class="fas fa-user-plus text-white text-xl"></i>
                 </a>
             </div>
             
